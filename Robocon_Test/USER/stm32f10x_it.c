@@ -72,15 +72,13 @@ void TIM5_IRQHandler(void)
 {
 	if ( TIM_GetITStatus(TIM5 , TIM_IT_Update) != RESET ) 
 	{	
-	
-		
 		it_count++;
 		count++;
 	
 		if(it_count%100==0)
-			{
-					GPIOB->ODR ^= GPIO_Pin_0;
-			}	 
+		{
+			GPIOB->ODR ^= GPIO_Pin_0;
+		}	 
 		
 		//5ms执行一次
 		if(!(count%5))						
@@ -104,10 +102,8 @@ void TIM5_IRQHandler(void)
 			motion_mode = 1;
 			if(it_count > 20000 && receive_flag)
 			{
-
-					Motor_Cal();
-					Motor_Run();
-
+				Motor_Cal();
+				Motor_Run();
 			}
 		}
 		
@@ -138,10 +134,10 @@ void USART1_IRQHandler(void)
 {
 	static uint8_t ch;
 	static union
-  {
-	 uint8_t data[4];
-	 float para_ready;
-  }para_get;
+  	{
+		uint8_t data[4];
+		float para_ready;
+	}para_get;
 	static uint8_t count=0;
 	static uint8_t i=0;
 
@@ -149,135 +145,134 @@ void USART1_IRQHandler(void)
 	{
 		USART_ClearITPendingBit( USART1,USART_IT_RXNE);
 		ch=USART_ReceiveData(USART1);
-		 switch(count)
-		 {
-			 case 0:
-				 if(ch=='E')
-				 {
-					 count++;
-					 i=0;
-				 }
-				 else
-					 count=0;
-				 break;			 			 
-			 case 1:
-				 para_get.data[3-i]=ch;
-			   i++;
-			   if(i>=4)
-				 {
-					 i=0;
-					 count++;
-				 }
-				 break;
-				 
-			 case 2:
-				 if(ch=='S')
-				 {
-						speed_set=para_get.para_ready;
-				 }
-				 else if(ch=='D')
-				 {
-				    direction_set=para_get.para_ready;
-				 }
-					 count=0;
-				 break;
+		switch(count)
+		{
+			case 0:
+			if(ch=='E')
+			{
+				count++;
+				i=0;
+			}
+			else
+				count=0;
+			break;
 
-			 
-			 default:
-				 count=0;
-			   break;		 
-		 }		 	 
-	 }
+			case 1:
+				para_get.data[3-i]=ch;
+				i++;
+			if(i>=4)
+			{
+				i=0;
+				count++;
+			}
+			break;
+
+			case 2:
+			if(ch=='S')
+			{
+				speed_set=para_get.para_ready;
+			}
+			else if(ch=='D')
+			{
+				direction_set=para_get.para_ready;
+			}
+				count=0;
+			break;
+
+
+			default:
+				count=0;
+			break;		 
+		}		 	 
+	}
 } 
 
 void UART4_IRQHandler(void)
 {	 
 	static uint8_t ch;
 	static union
-  {
-	 uint8_t data[24];
-	 float ActVal[6];
-  }posture;
+	{
+		uint8_t data[24];
+		float ActVal[6];
+	}posture;
 	static uint8_t count=0;
 	static uint8_t i=0;
 
 	
 	if (USART_GetFlagStatus(UART4, USART_FLAG_ORE) != RESET)//注意！不能使用if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)来判断
-  {
-			  USART_ClearFlag(USART2, USART_FLAG_ORE);
-        USART_ReceiveData(UART4);
-				receive_flag=0;
-				count=0;
-				
-  }	
-	
+	{
+		USART_ClearFlag(USART2, USART_FLAG_ORE);
+		USART_ReceiveData(UART4);
+		receive_flag=0;
+		count=0;
+
+	}	
+
 	if(USART_GetITStatus(UART4, USART_IT_RXNE)==SET)   
 	{
 		USART_ClearITPendingBit( UART4,USART_IT_RXNE);
 		ch=USART_ReceiveData(UART4);
-		 switch(count)
-		 {
-			 case 0:
-				 if(ch==0x0d)
-				 {
-					 count++;
-					 receive_flag=1;
-				 }
-				 else
-					 count=0;
-				 break;
-				 
-			 case 1:
-				 if(ch==0x0a)
-				 {
-					 i=0;
-					 count++;
-				 }
-				 else if(ch==0x0d);
-				 else
-					 count=0;
-				 break;
-				 
-			 case 2:
-				 posture.data[i]=ch;
-			   i++;
-			   if(i>=24)
-				 {
-					 i=0;
-					 count++;
-				 }
-				 break;
-				 
-			 case 3:
-				 if(ch==0x0a)
-					 count++;
-				 else
-					 count=0;
-				 break;
-				 
-			 case 4:
-				 if(ch==0x0d)
-				 {
-  				 motion.zangle = posture.ActVal[0];
-	  		   motion.xangle = posture.ActVal[1];
-		  	   motion.yangle = posture.ActVal[2];
-			     motion.pos_x  = -posture.ActVal[3];
-			     motion.pos_y  = -posture.ActVal[4];
-			     motion.w_z    = posture.ActVal[5];
-//					 timede=run;
-//					 run=0; 用于计时
-				 }
-			   count=0;
-				 break;
-			 
-			 default:
-				 count=0;
-			   break;	
-	 
-		 }
-		 
-	 }
+		switch(count)
+		{
+			case 0:
+				if(ch==0x0d)
+				{
+					count++;
+					receive_flag=1;
+				}
+				else
+					count=0;
+			break;
 
+			case 1:
+				if(ch==0x0a)
+				{
+					i=0;
+					count++;
+				}
+				else if(ch==0x0d);
+				else
+					count=0;
+			break;
+
+			case 2:
+				posture.data[i]=ch;
+				i++;
+				if(i>=24)
+					{
+						i=0;
+						count++;
+				}
+			break;
+
+			case 3:
+				if(ch==0x0a)
+					count++;
+				else
+					count=0;
+			break;
+
+			case 4:
+				if(ch==0x0d)
+				{
+					motion.zangle = posture.ActVal[0];
+					motion.xangle = posture.ActVal[1];
+					motion.yangle = posture.ActVal[2];
+					motion.pos_x  = -posture.ActVal[3];
+					motion.pos_y  = -posture.ActVal[4];
+					motion.w_z    = posture.ActVal[5];
+				//					 timede=run;
+				//					 run=0; 用于计时
+				}
+				count=0;
+			break;
+
+			default:
+				count=0;
+			break;	
+
+		}
+	}
 } 
 
 

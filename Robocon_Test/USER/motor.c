@@ -11,7 +11,7 @@ void Motor_Cal()
 		}
 		else if (motion_mode == 1)
 		{
-				speed_get = point_to_point(150, -100, 100, motion.pos_x, motion.pos_y, 0, motion.zangle);
+			speed_get = point_to_point(150, -100, 100, motion.pos_x, motion.pos_y, 0, motion.zangle);
 			
 //				speed_get = closeLoopLine(300, 90,
 //	                     0, motion.zangle,
@@ -31,44 +31,44 @@ void Motor_Run()
 	{
 		if(speed_get.v1>=0)
 		{
-				Motor1_Z(speed_get.v1);
-				Motor1_F(0);
+			Motor1_Z(speed_get.v1);
+			Motor1_F(0);
 		}
 		else if(speed_get.v1<0)
 		{
-				Motor1_Z(0);			
-				Motor1_F(-speed_get.v1);
+			Motor1_Z(0);			
+			Motor1_F(-speed_get.v1);
 		}	
 
 		if(speed_get.v2>=0)
 		{
-				Motor2_Z(speed_get.v2);
-				Motor2_F(0);
+			Motor2_Z(speed_get.v2);
+			Motor2_F(0);
 		}
 		else if(speed_get.v2<0)
 		{
-				Motor2_Z(0);			
-				Motor2_F(-speed_get.v2);
+			Motor2_Z(0);			
+			Motor2_F(-speed_get.v2);
 		}			
 
 		if(speed_get.v3>=0)
 		{
-				Motor3_Z(speed_get.v3);
-				Motor3_F(0);
+			Motor3_Z(speed_get.v3);
+			Motor3_F(0);
 		}
 		else if(speed_get.v3<0)
 		{
-				Motor3_Z(0);
-				Motor3_F(-speed_get.v3);
+			Motor3_Z(0);
+			Motor3_F(-speed_get.v3);
 		}					
 	}
 	else
 	{
-				Motor1_Z(0);
-				Motor1_F(0);				
-				Motor2_Z(0);
-				Motor2_F(0);				
-				Motor3_Z(0);
-				Motor3_F(0);	
+		Motor1_Z(0);
+		Motor1_F(0);				
+		Motor2_Z(0);
+		Motor2_F(0);				
+		Motor3_Z(0);
+		Motor3_F(0);	
 	}
 }
