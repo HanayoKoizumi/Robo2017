@@ -16,7 +16,6 @@ void Motor_Cal()
 //				speed_get = closeLoopLine(300, 90,
 //	                     0, motion.zangle,
 //	                      motion.pos_x, motion.pos_y)	;		
-				
 		}
 		if(speed_get.v1>1000)
 			speed_get.v1=1000;
