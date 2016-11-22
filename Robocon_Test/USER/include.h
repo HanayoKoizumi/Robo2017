@@ -17,6 +17,18 @@
 #include "RCC_Conf.h"
 #include "DAC.h"
 	
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_rcc.h"
+#include "stm32f10x_spi.h"
+#include "stm32f10x_fsmc.h"
+#include "stm32f10x_tim.h"
+
+#include "data.h"
+#include "stdio.h"
+#include "spi.h"
+#include "nrf24l01.h"
+#include "system.h"
+
 typedef struct
 {
 		float pos_x ;

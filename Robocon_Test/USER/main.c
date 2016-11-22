@@ -1,13 +1,13 @@
 /*!
  * @file       main.c
- * @brief      Robocon²âÊÔĞ¡³µÖ÷³ÌĞò
+ * @brief      RoboconÂ²Ã¢ÃŠÃ”ÃÂ¡Â³ÂµÃ–Ã·Â³ÃŒÃÃ²
  * @author     HRCT
  * @version    v1.0
  * @date       2016-09-27
  */
  
  
-//ÓÉÓÚºËĞÄ°åÊ¹ÓÃÄÚ²¿Ê±ÖÓ£¬¹ÊÆÁ±ÎµôSystemInit
+//Ã“Ã‰Ã“ÃšÂºÃ‹ÃÃ„Â°Ã¥ÃŠÂ¹Ã“ÃƒÃ„ÃšÂ²Â¿ÃŠÂ±Ã–Ã“Â£Â¬Â¹ÃŠÃ†ÃÂ±ÃÂµÃ´SystemInit
 
 #include  "include.h"
 float speed_set=0;
@@ -18,10 +18,9 @@ uint32_t a,b,c=0;
 
 int main()
 {
-
-
-
 	RCC_Init();
+	//F9 F8 D3æ²¡å†²çª
+	ReceiveInit();//2401åˆå§‹åŒ–
 
 	Robocon_PhoTriRacing_Board_Init();
 
@@ -33,9 +32,8 @@ int main()
 		 
 	while(1)
 	{
-
-
-	//printf("X_Angle£º%.2f\r\nY_Angle£º%.2f\r\nZ_Angle£º%.2f\r\nX£º%.2f\r\nY£º%.2f\r\nZ_w£º%.2f\r\n",motion.xangle,motion.yangle,motion.zangle,motion.pos_x,motion.pos_y,motion.w_z);
+		ReceiveData();
+	//printf("X_AngleÂ£Âº%.2f\r\nY_AngleÂ£Âº%.2f\r\nZ_AngleÂ£Âº%.2f\r\nXÂ£Âº%.2f\r\nYÂ£Âº%.2f\r\nZ_wÂ£Âº%.2f\r\n",motion.xangle,motion.yangle,motion.zangle,motion.pos_x,motion.pos_y,motion.w_z);
 
 	} 
 

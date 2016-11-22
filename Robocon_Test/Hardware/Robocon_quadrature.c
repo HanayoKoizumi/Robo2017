@@ -82,6 +82,7 @@ void Quadrature_decode_TIM8_Init(void)
 	 
 	 TIM8->CNT = 0;
 	 TIM8->CR1 |= (1<<0);
+ }
 	
 	
 	

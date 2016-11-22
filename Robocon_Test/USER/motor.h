@@ -5,5 +5,6 @@ void Motor_Cal(void);
 void Motor_Run(void);
 
 extern uint8_t motion_mode;
+extern uint8_t point_count;
 
 #endif
