@@ -10,29 +10,25 @@
 
 void Robocon_PhoTriRacing_Board_Init(void)
 {
-	//GPIOE
+	//GPIOE 
 	Quadrature_decode_TIM1_Init();	
-	//GPIOC		//正交解码初始化
+	//GPIOC	C6 C7	//正交解码初始化
 	Quadrature_decode_TIM8_Init();
-	//GPIOB
+	//GPIOB B6 B7
 	Quadrature_decode_TIM4_Init();
 
-	//GPIOA
+	//GPIOA A0 1 2 3 6 7
 	PWMout_TIM2_TIM3_Init(0, 0, 0, 0, 0, 0);						//PWM输出初始化
-	//GPIOA
+	//GPIOA A9 A10
 	USART1_Init(115200);//串口初始化
-	//GPIOC
+	//GPIOC C10 C11
 	UART4_Init(115200);
-	//GPIOB GPIOC 
+	//GPIOB GPIOC B0 B1 C4
 	Current_ADGet_Init();						//电流采集初始化
-	//GPIOE
+	//GPIOE E0 E1 E2 E3
 	KEY_EXTI_Init();							//按键中断初始化
 
 	Interrupt_TIM5_Init();					//定时器中断初始化
-
-
-
-
 }
 
 

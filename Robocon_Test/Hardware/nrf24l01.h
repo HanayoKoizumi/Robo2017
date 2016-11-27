@@ -64,11 +64,11 @@
 //#define NRF_CE_LOW()	      GPIO_ResetBits(GPIOA,GPIO_Pin_2)			      //CE置低
 //#define NRF_Read_IRQ()		  GPIO_ReadInputDataBit ( GPIOA, GPIO_Pin_3)  //中断引脚
 
-#define NRF_CSN_HIGH()      GPIO_SetBits(GPIOF, GPIO_Pin_9)
-#define NRF_CSN_LOW()       GPIO_ResetBits(GPIOF, GPIO_Pin_9)		        //csn置低
-#define NRF_CE_HIGH()	    GPIO_SetBits(GPIOF,GPIO_Pin_8)
-#define NRF_CE_LOW()	    GPIO_ResetBits(GPIOF,GPIO_Pin_8)			      //CE置低
-#define NRF_Read_IRQ()		GPIO_ReadInputDataBit (GPIOD, GPIO_Pin_3)  //中断引脚
+#define NRF_CSN_HIGH()      GPIO_SetBits(GPIOB, GPIO_Pin_10)
+#define NRF_CSN_LOW()       GPIO_ResetBits(GPIOB, GPIO_Pin_10)		        //csn置低
+#define NRF_CE_HIGH()	    GPIO_SetBits(GPIOB,GPIO_Pin_9)
+#define NRF_CE_LOW()	    GPIO_ResetBits(GPIOB,GPIO_Pin_9)			      //CE置低
+#define NRF_Read_IRQ()		GPIO_ReadInputDataBit (GPIOB, GPIO_Pin_11)  //中断引脚
 
 
 void SPI_NRF_Init(void);

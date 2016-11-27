@@ -19,7 +19,7 @@ uint32_t a,b,c=0;
 int main()
 {
 	RCC_Init();
-	//F9 F8 D3没冲突
+	// SPI1 A4 A5 A6 A7
 	ReceiveInit();//2401初始化
 
 	Robocon_PhoTriRacing_Board_Init();

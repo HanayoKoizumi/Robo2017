@@ -6,6 +6,11 @@ uint8_t TX_BUF[TX_PLOAD_WIDTH];		//发射数据缓存
 uint8_t TX_ADDRESS[TX_ADR_WIDTH] = {0x34,0x43,0x10,0x10,0x01};  // 定义一个静态发送地址
 uint8_t RX_ADDRESS[RX_ADR_WIDTH] = {0x34,0x43,0x10,0x10,0x01};
 
+static void Delay(uint32_t i)	  
+{
+	while(i--);
+}
+
 ///*
 //	如果2401与mcu连接，蜂鸣器鸣叫
 //*/
@@ -28,31 +33,29 @@ void SPI_NRF_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/*开启相应IO端口的时钟*/
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB
-	                     |RCC_APB2Periph_GPIOF
-	                     |RCC_APB2Periph_GPIOD,ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 
 	/*使能SPI2时钟*/
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
-	/*配置 SPI_NRF_SPI的 SCK,MISO,MOSI引脚，GPIOB^13,GPIOB^14,GPIOB^15 */
+	/*配置 SPI_NRF_SPI的 SCK,MISO,MOSI引脚， SCK--B12  MSIO--B14  MOSI--B15*/
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //复用功能
 	GPIO_Init(GPIOB, &GPIO_InitStructure);  
 
-	/*配置SPI_NRF_SPI的CE引脚,和SPI_NRF_SPI的 CSN 引脚   CE--PF8  CSN--PF9*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8|GPIO_Pin_9;
+	/*配置SPI_NRF_SPI的CE引脚,和SPI_NRF_SPI的 CSN 引脚   CE--B9  CSN--B10*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9|GPIO_Pin_10;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOF, &GPIO_InitStructure);
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 
-	/*配置SPI_NRF_SPI的IRQ引脚		IRQ--PD3	*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	/*配置SPI_NRF_SPI的IRQ引脚		IRQ--PB11	*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU ;  //上拉输入
-	GPIO_Init(GPIOD, &GPIO_InitStructure); 
+	GPIO_Init(GPIOB, &GPIO_InitStructure); 
 		  
 	/* 这是自定义的宏，用于拉高csn引脚，NRF进入空闲状态 */
 	NRF_CSN_HIGH(); 
@@ -207,7 +210,7 @@ void NRF_TX_Mode(void)
 
 	/*CE拉高，进入发送模式*/	
 	NRF_CE_HIGH();
-	SYSTICK_Delay1ms(10);  //CE要拉高一段时间才进入发送模式
+	Delay(60000);  //CE要拉高一段时间才进入发送模式
 }
 
 /**
@@ -303,7 +306,7 @@ void NRF_RX_Mode(void)
 
 	/*CE拉高，进入接收模式*/	
 	NRF_CE_HIGH();
-	SYSTICK_Delay1ms(10); 
+	Delay(60000); 
 }  
 
 /**
