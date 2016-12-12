@@ -45,6 +45,8 @@ extern float direction_set;
 extern motion_status motion;
 extern uint32_t it_count;
 
+extern uint8_t movePointCount;
+
 
 #endif
 

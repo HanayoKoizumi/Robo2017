@@ -11,16 +11,13 @@ static void Delay(uint32_t i)
 	while(i--);
 }
 
-///*
-//	如果2401与mcu连接，蜂鸣器鸣叫
-//*/
-//void NRF_CheckConnect(void)
-//{
-//	uint8_t nrf_check_flag;//用于检测2401连接状况
-
-//	nrf_check_flag = NRF_Check();
-
-//}
+/*
+	如果2401与mcu连接，蜂鸣器鸣叫
+*/
+void NRF_CheckConnect(void)
+{	
+	while(NRF_Check() == ERROR);
+}
 
 /**
   * @brief  SPI的 I/O配置
@@ -33,29 +30,35 @@ void SPI_NRF_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/*开启相应IO端口的时钟*/
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOE,ENABLE);
 
 	/*使能SPI2时钟*/
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
-	/*配置 SPI_NRF_SPI的 SCK,MISO,MOSI引脚， SCK--B12  MSIO--B14  MOSI--B15*/
+	/*配置 SPI_NRF_SPI的 SCK,MISO,MOSI引脚， SCK--B13  MISO--B14  MOSI--B15*/
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //复用功能
 	GPIO_Init(GPIOB, &GPIO_InitStructure);  
 
-	/*配置SPI_NRF_SPI的CE引脚,和SPI_NRF_SPI的 CSN 引脚   CE--B9  CSN--B10*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9|GPIO_Pin_10;
+	/*和SPI_NRF_SPI的 CSN 引脚     CSN--B11*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
+	/*配置SPI_NRF_SPI的CE引脚,	CE--E12*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-	/*配置SPI_NRF_SPI的IRQ引脚		IRQ--PB11	*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+
+	/*配置SPI_NRF_SPI的IRQ引脚		IRQ--PE14	*/
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU ;  //上拉输入
-	GPIO_Init(GPIOB, &GPIO_InitStructure); 
+	GPIO_Init(GPIOE, &GPIO_InitStructure); 
 		  
 	/* 这是自定义的宏，用于拉高csn引脚，NRF进入空闲状态 */
 	NRF_CSN_HIGH(); 
@@ -210,7 +213,7 @@ void NRF_TX_Mode(void)
 
 	/*CE拉高，进入发送模式*/	
 	NRF_CE_HIGH();
-	Delay(60000);  //CE要拉高一段时间才进入发送模式
+	SYSTICK_Delay1ms(10);  //CE要拉高一段时间才进入发送模式
 }
 
 /**
@@ -319,10 +322,12 @@ void NRF_RX_Mode(void)
 uint8_t NRF_Rx_Dat(uint8_t *rxbuf)
 {
 	uint8_t state; 
+	
 	NRF_CE_HIGH();	 //进入接收状态
 	 /*等待接收中断*/
-	while(NRF_Read_IRQ()!=0); 
-	
+	while(NRF_Read_IRQ()!=0);
+	//Delay(1000);
+
 	NRF_CE_LOW();  	 //进入待机状态
 	/*读取status寄存器的值  */               
 	state=SPI_NRF_ReadReg(STATUS);
@@ -333,12 +338,18 @@ uint8_t NRF_Rx_Dat(uint8_t *rxbuf)
 	/*判断是否接收到数据*/
 	if(state&RX_DR)                                 //接收到数据
 	{
+		//NRF_CE_LOW();
+		//SPI_NRF_WriteReg(NRF_WRITE_REG+STATUS,state);
 	  	SPI_NRF_ReadBuf(RD_RX_PLOAD,rxbuf,RX_PLOAD_WIDTH);//读取数据
-	    SPI_NRF_WriteReg(FLUSH_RX,NOP);          //清除RX FIFO寄存器
+	  	//Delay(1000);
+	    SPI_NRF_WriteReg(FLUSH_RX,0xFF);          //清除RX FIFO寄存器
 	  	return RX_DR; 
 	}
 	else    
+	{
+		//SPI_NRF_WriteReg(NRF_WRITE_REG+STATUS,state);
 		return ERROR;                    //没收到任何数据
+	}
 }
 
 /**

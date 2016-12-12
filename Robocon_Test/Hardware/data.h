@@ -35,6 +35,8 @@ typedef struct
 void ClearReceiveData(void);
 void ReceiveData(void);
 void ReceiveInit(void);
+void ReceiveTest(void);
+
 
 extern uint16StructTypeDef receiveData[DATASIZE];
 

@@ -40,6 +40,7 @@ static float origin_cll_x=0;   //位置闭环和点到点的起点
 static float origin_cll_y=0;
 static float err_pos_sum = 0, err_ang_sum = 0;
 static float err_pos_last = 0, err_ang_last = 0;
+
 /* Extern   variables ---------------------------------------------------------*/
 /* Extern   function prototypes -----------------------------------------------*/
 /* Private  function prototypes -----------------------------------------------*/
@@ -269,15 +270,26 @@ wheel_speed point_to_point(float vel,
 		/* 判断当前状态是否满足停下来 */		
 		if (fabs(distance) < END_ERR_ALLOW&&fabs(act_vel) < END_VEL_ALLOW)
 		{
-			speed_out.status = SUCCESS;	
-		// //	flag = 0;
-		// //	flag_start = 0;
-		// 	speed_out.v1 = 0;
-		// 	speed_out.v2 = 0;
-		// 	speed_out.v3 = 0;
-		// 	return speed_out;
+				
+			speed_out = closeLoopLine(ex_vel, ward, ex_Ang, act_Ang, pos_x, pos_y);//三轮速度不会为0，只有标志位变化
+			speed_out.status = SUCCESS;
+			
+			if(movePointCount < DATASIZE - 1)//防止越界
+			{
+				if(receiveData[movePointCount+1].x == 0&&
+					receiveData[movePointCount+1].y == 4000);//下一位为原始数据，说明路径点已经走完
+				else
+				{
+					movePointCount++;
+				}
+			}
+		//	flag = 0;
+		//	flag_start = 0;
+			// speed_out.v1 = 0;
+			// speed_out.v2 = 0;
+			// speed_out.v3 = 0;
+			return speed_out;
 		}
-
 		/* 不满足停下来的条件 */
 		speed_out.status = FAILURE;		
 		speed_out = closeLoopLine(ex_vel, ward, ex_Ang, act_Ang, pos_x, pos_y);

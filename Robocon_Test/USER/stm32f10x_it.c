@@ -29,6 +29,8 @@
 volatile u32 count = 0;
 u32 count1;
 uint8_t receive_flag=0;
+
+
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
   */
@@ -80,14 +82,14 @@ void TIM5_IRQHandler(void)
 			GPIOB->ODR ^= GPIO_Pin_0;
 		}	 
 		
-		//5ms执行一次
+		//5ms脰麓脨脨脪禄麓脦
 		if(!(count%5))						
 		{
-			
+			//ReceiveInit();
 		}
 		
-		//10ms执行一次
-		//PWM速度控制
+		//10ms脰麓脨脨脪禄麓脦
+		//PWM脣脵露脠驴脴脰脝
 		if(!(count%10))						
 		{
 //			Motor1_Z(0);
@@ -107,8 +109,8 @@ void TIM5_IRQHandler(void)
 			}
 		}
 		
-		//50ms执行一次
-		//编码器测速 位置发送
+		//50ms脰麓脨脨脪禄麓脦
+		//卤脿脗毛脝梅虏芒脣脵 脦禄脰脙路垄脣脥
 		if(!(count%50))						
 		{
 			Encode[0] = TIM1->CNT;
@@ -119,10 +121,10 @@ void TIM5_IRQHandler(void)
 //			TIM8->CNT = 0;
 //			TIM4->CNT = 0;
 			
-		//  printf("X_Angle：%.2f\r\nY_Angle：%.2f\r\nZ_Angle：%.2f\r\nX：%.2f\r\nY：%.2f\r\nZ_w：%.2f\r\n",xangle,yangle,zangle,pos_x,pos_y,w_z);
+		//  printf("X_Angle拢潞%.2f\r\nY_Angle拢潞%.2f\r\nZ_Angle拢潞%.2f\r\nX拢潞%.2f\r\nY拢潞%.2f\r\nZ_w拢潞%.2f\r\n",xangle,yangle,zangle,pos_x,pos_y,w_z);
 		}
 		
-		//计数清零
+		//录脝脢媒脟氓脕茫
 		if(count >= 100)
 			count &= 0;
 		
@@ -199,7 +201,7 @@ void UART4_IRQHandler(void)
 	static uint8_t i=0;
 
 	
-	if (USART_GetFlagStatus(UART4, USART_FLAG_ORE) != RESET)//注意！不能使用if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)来判断
+	if (USART_GetFlagStatus(UART4, USART_FLAG_ORE) != RESET)//脳垄脪芒拢隆虏禄脛脺脢鹿脫脙if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)脌麓脜脨露脧
 	{
 		USART_ClearFlag(USART2, USART_FLAG_ORE);
 		USART_ReceiveData(UART4);
@@ -262,7 +264,7 @@ void UART4_IRQHandler(void)
 					motion.pos_y  = -posture.ActVal[4];
 					motion.w_z    = posture.ActVal[5];
 				//					 timede=run;
-				//					 run=0; 用于计时
+				//					 run=0; 脫脙脫脷录脝脢卤
 				}
 				count=0;
 			break;
@@ -275,6 +277,85 @@ void UART4_IRQHandler(void)
 	}
 } 
 
+void USART3_IRQHandler(void)
+{
+	static uint8_t j = 0;
+	static uint8_t receiveCount = 1;
+
+	static uint8_t temp;
+	static uint8_t num = 0;
+	static uint8_t receiveBuff[4];
+
+	if(USART_GetITStatus(USART3, USART_IT_RXNE)==SET)
+	{
+		USART_ClearITPendingBit( USART3,USART_IT_RXNE);
+		temp = USART_ReceiveData(USART3);
+		switch(num)
+		{
+			case 0:
+				if(temp == 0x00)
+					num++;
+				else
+					num = 0;
+			break;
+
+			case 1:
+				if(temp == 0xff)
+				{
+					j = 0;
+					num++;
+				}
+				else if(num == 0x00);
+				else
+					num = 0;
+			break;
+
+			case 2:
+				receiveBuff[j] = temp;
+				j++;
+				if(j >= 4)
+				{
+					j = 0;
+					num++;
+				}
+			break;
+
+			case 3:
+				if(temp == 0x00)
+					num++;
+				else
+					num = 0;
+			break;
+
+			case 4:
+				if(temp ==0xff)
+				{
+					if((receiveBuff[0] == 0x00)&&(receiveBuff[1] == 0x00)&&
+						(receiveBuff[2] == 0x00)&&(receiveBuff[3] == 0x00))//閲嶇疆淇″彿
+					{
+						receiveCount = 1;
+						ClearReceiveData();
+						movePointCount = 0;
+					}
+					else
+					{
+						if(receiveCount < DATASIZE)//鍦ㄦ暟缁勮寖鍥村唴
+						{
+							receiveData[receiveCount].x = ((uint16_t)receiveBuff[0] << 8)|(uint16_t)receiveBuff[1];//杞崲鏁版嵁
+							receiveData[receiveCount].y = ((uint16_t)receiveBuff[2] << 8)|(uint16_t)receiveBuff[3]; 
+							receiveCount++;
+						}
+					}
+				}
+				num = 0;
+			break;
+
+			default:
+				num = 0;
+			break;
+		}
+	}	
+}
 
 /**
   * @brief  This function handles EXTI interrupt request.
@@ -283,46 +364,46 @@ void UART4_IRQHandler(void)
   */
 void EXTI0_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line0) == SET) //确保是否产生了EXTI Line中断
+	if(EXTI_GetITStatus(EXTI_Line0) == SET) //脠路卤拢脢脟路帽虏煤脡煤脕脣EXTI Line脰脨露脧
 	{
-		//中断处理事件
+		//脰脨露脧麓娄脌铆脢脗录镁
 		
 		count1++;
 		
-		EXTI_ClearITPendingBit(EXTI_Line0);     //清除中断标志位
+		EXTI_ClearITPendingBit(EXTI_Line0);     //脟氓鲁媒脰脨露脧卤锚脰戮脦禄
 	}  
 }
 void EXTI1_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line1) == RESET) //确保是否产生了EXTI Line中断
+	if(EXTI_GetITStatus(EXTI_Line1) == RESET) //脠路卤拢脢脟路帽虏煤脡煤脕脣EXTI Line脰脨露脧
 	{
-		//中断处理事件
+		//脰脨露脧麓娄脌铆脢脗录镁
 		count1 += 2;
 		
 		
-		EXTI_ClearITPendingBit(EXTI_Line1);     //清除中断标志位
+		EXTI_ClearITPendingBit(EXTI_Line1);     //脟氓鲁媒脰脨露脧卤锚脰戮脦禄
 	}  
 }
 void EXTI2_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line2) == RESET) //确保是否产生了EXTI Line中断
+	if(EXTI_GetITStatus(EXTI_Line2) == RESET) //脠路卤拢脢脟路帽虏煤脡煤脕脣EXTI Line脰脨露脧
 	{
-		//中断处理事件
+		//脰脨露脧麓娄脌铆脢脗录镁
 		
 		
 		
-		EXTI_ClearITPendingBit(EXTI_Line2);     //清除中断标志位
+		EXTI_ClearITPendingBit(EXTI_Line2);     //脟氓鲁媒脰脨露脧卤锚脰戮脦禄
 	}  
 }
 void EXTI3_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line3) == RESET) //确保是否产生了EXTI Line中断
+	if(EXTI_GetITStatus(EXTI_Line3) == RESET) //脠路卤拢脢脟路帽虏煤脡煤脕脣EXTI Line脰脨露脧
 	{
-		//中断处理事件
+		//脰脨露脧麓娄脌铆脢脗录镁
 		
 		
 		
-		EXTI_ClearITPendingBit(EXTI_Line3);     //清除中断标志位
+		EXTI_ClearITPendingBit(EXTI_Line3);     //脟氓鲁媒脰脨露脧卤锚脰戮脦禄
 	}  
 }
 
